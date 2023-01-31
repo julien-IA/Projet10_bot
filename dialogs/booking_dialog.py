@@ -32,14 +32,16 @@ class BookingDialog(CancelAndHelpDialog):
                 self.destination_step,
                 self.origin_step,
                 self.travel_date_step,
-                # self.confirm_step,
+                self.return_date_step,
+                self.travel_max_cost_step,
+                self.confirm_step,
                 self.final_step,
             ],
         )
         waterfall_dialog.telemetry_client = telemetry_client
 
         self.add_dialog(text_prompt)
-        # self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
+        self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(
             DateResolverDialog(DateResolverDialog.__name__, self.telemetry_client)
         )
@@ -98,6 +100,46 @@ class BookingDialog(CancelAndHelpDialog):
 
         return await step_context.next(booking_details.travel_date)
 
+    async def return_date_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Prompt for return date."""
+        booking_details = step_context.options
+
+        # Capture the response to the previous step's prompt
+        booking_details.travel_date = step_context.result
+        if not booking_details.return_date or self.is_ambiguous(
+            booking_details.return_date
+        ):
+            return await step_context.begin_dialog(
+                DateResolverDialog.__name__, booking_details.return_date
+            )  # pylint: disable=line-too-long
+
+        if booking_details.return_date <= booking_details.travel_date:
+            await step_context.context.send_activity(
+                "Return date must be after travel date. Please enter a valid return date."
+            )
+            return await step_context.replace_dialog(self.id, booking_details)
+
+        return await step_context.next(booking_details.return_date)
+
+    async def travel_max_cost_step(
+        self, step_context: WaterfallStepContext
+    ) -> DialogTurnResult:
+        """Prompt for travel cost."""
+
+        booking_details = step_context.options
+
+        # Capture the results of the previous step
+        booking_details.return_date = step_context.result
+        if booking_details.max_cost is None :
+            return await step_context.prompt(
+                TextPrompt.__name__,
+                PromptOptions(
+                    prompt=MessageFactory.text("What is the maximum price for this trip ?")
+                ),
+            )  # pylint: disable=line-too-long,bad-continuation
+
+        return await step_context.next(booking_details.max_cost)
+
     async def confirm_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
@@ -105,10 +147,11 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details = step_context.options
 
         # Capture the results of the previous step
-        booking_details.travel_date = step_context.result
+        booking_details.max_cost = step_context.result
         msg = (
             f"Please confirm, I have you traveling to: { booking_details.destination }"
-            f" from: { booking_details.origin } on: { booking_details.travel_date}."
+            f" from: { booking_details.origin } from: { booking_details.travel_date} to: { booking_details.return_date }"
+            f" for a maximum price of { booking_details.max_cost } $"
         )
 
         # Offer a YES/NO prompt.
@@ -120,7 +163,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Complete the interaction and end the dialog."""
         if step_context.result:
             booking_details = step_context.options
-            booking_details.travel_date = step_context.result
+            booking_details.result = step_context.result
 
             return await step_context.end_dialog(booking_details)
 

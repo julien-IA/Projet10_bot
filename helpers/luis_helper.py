@@ -79,20 +79,49 @@ class LuisHelper:
                             from_entities[0]["text"].capitalize()
                         )
 
+                from_entities = recognizer_result.entities.get("$instance", {}).get(
+                    "Price", []
+                )
+                if len(from_entities) > 0:
+                    if recognizer_result.entities.get("Price", [{"$instance": {}}])[0][
+                        "$instance"
+                    ]:
+                        result.max_cost = from_entities[0]["number"]
+                    else:
+                        result.max_cost = None
+
+
                 # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop
                 # the Time part. TIMEX is a format that represents DateTime expressions that include some ambiguity.
                 # e.g. missing a Year.
                 date_entities = recognizer_result.entities.get("datetime", [])
                 if date_entities:
-                    timex = date_entities[0]["timex"]
+                    timex_1 = date_entities[0]["timex"]
+                    timex_2 = date_entities[1]["timex"]
 
-                    if timex:
-                        datetime = timex[0].split("T")[0]
-
-                        result.travel_date = datetime
-
+                    if timex_1:
+                        datetime_1 = timex_1[0].split("T")[0]
+                    else :
+                        datetime_1 = None
+                    if timex_2:
+                        datetime_2 = timex_2[0].split("T")[0]
+                    else :
+                        datetime_2 = None
+                    if datetime_2 == None :
+                        result.travel_date = datetime_1
+                        result.travel_date_return = None
+                    elif datetime_1 == None :
+                        result.travel_date = datetime_1
+                        result.travel_date_return = datetime_2
+                    elif datetime_1 > datetime_2:
+                        result.travel_date = datetime_2
+                        result.travel_date_return = datetime_1
+                    else :
+                        result.travel_date = datetime_1
+                        result.travel_date_return = datetime_2
                 else:
                     result.travel_date = None
+                    result.travel_date_return = None
 
         except Exception as exception:
             print(exception)
