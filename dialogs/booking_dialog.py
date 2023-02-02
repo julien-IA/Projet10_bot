@@ -9,7 +9,7 @@ from botbuilder.dialogs.prompts import ConfirmPrompt, TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryClient
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
-
+from datetime import datetime
 
 class BookingDialog(CancelAndHelpDialog):
     """Flight booking implementation."""
@@ -33,6 +33,7 @@ class BookingDialog(CancelAndHelpDialog):
                 self.origin_step,
                 self.travel_date_step,
                 self.return_date_step,
+                self.verif_date_step,
                 self.travel_max_cost_step,
                 self.confirm_step,
                 self.final_step,
@@ -92,10 +93,10 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.origin = step_context.result
         if not booking_details.travel_date or self.is_ambiguous(
-            booking_details.travel_date
+            booking_details.travel_date, None
         ):
             return await step_context.begin_dialog(
-                DateResolverDialog.__name__, booking_details.travel_date
+                DateResolverDialog.__name__, (booking_details.travel_date,1)
             )  # pylint: disable=line-too-long
 
         return await step_context.next(booking_details.travel_date)
@@ -110,16 +111,30 @@ class BookingDialog(CancelAndHelpDialog):
             booking_details.return_date
         ):
             return await step_context.begin_dialog(
-                DateResolverDialog.__name__, booking_details.return_date
+                DateResolverDialog.__name__, (booking_details.return_date,2)
             )  # pylint: disable=line-too-long
 
-        if booking_details.return_date <= booking_details.travel_date:
-            await step_context.context.send_activity(
-                "Return date must be after travel date. Please enter a valid return date."
-            )
-            return await step_context.replace_dialog(self.id, booking_details)
+        return await step_context.next(booking_details.return_date)
+
+    
+    async def verif_date_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """ensure that the departure date is before the return date"""
+        print('coucou')
+        booking_details = step_context.options
+        # Capture the response to the previous step's prompt
+        booking_details.return_date = step_context.result
+
+        d1 = datetime.strptime(booking_details.travel_date , "%Y-%m-%d")
+        d2 = datetime.strptime(booking_details.return_date , "%Y-%m-%d")
+        print(d1,d2)
+        if (d1 < d2):
+            booking_details.return_date=None
+            return await step_context.begin_dialog(
+                DateResolverDialog.__name__, (booking_details.return_date,3)
+            )  # pylint: disable=line-too-long
 
         return await step_context.next(booking_details.return_date)
+
 
     async def travel_max_cost_step(
         self, step_context: WaterfallStepContext
@@ -173,3 +188,11 @@ class BookingDialog(CancelAndHelpDialog):
         """Ensure time is correct."""
         timex_property = Timex(timex)
         return "definite" not in timex_property.types
+
+    def is_depart_before_return(self, timex_depart: str, timex_return: str)->bool:
+        print('coucou')
+        """ensure that the departure date is before the return date"""
+        d1 = datetime.strptime(timex_depart, "%Y-%m-%d")
+        d2 = datetime.strptime(timex_return, "%Y-%m-%d")
+        return d1 < d2
+    

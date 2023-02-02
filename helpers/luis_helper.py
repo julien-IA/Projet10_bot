@@ -107,21 +107,9 @@ class LuisHelper:
                         datetime_2 = timex_2[0].split("T")[0]
                     else :
                         datetime_2 = None
-                    if datetime_2 == None :
-                        result.travel_date = datetime_1
-                        result.travel_date_return = None
-                    elif datetime_1 == None :
-                        result.travel_date = datetime_1
-                        result.travel_date_return = datetime_2
-                    elif datetime_1 > datetime_2:
-                        result.travel_date = datetime_2
-                        result.travel_date_return = datetime_1
-                    else :
-                        result.travel_date = datetime_1
-                        result.travel_date_return = datetime_2
                 else:
                     result.travel_date = None
-                    result.travel_date_return = None
+                    result.return_date = None
 
         except Exception as exception:
             print(exception)

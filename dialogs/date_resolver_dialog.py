@@ -47,9 +47,13 @@ class DateResolverDialog(CancelAndHelpDialog):
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
         """Prompt for the date."""
-        timex = step_context.options
-
-        prompt_msg = "On what date would you like to travel?"
+        timex, step = step_context.options
+        if(step == 1):
+            prompt_msg = "On what date would you like to depart?"
+        if(step == 2):
+            prompt_msg = "On what date would you like to return?"
+        if(step == 3):
+            prompt_msg = "The return date must be after the departure date. Please enter a valid return date."
         reprompt_msg = (
             "I'm sorry, for best results, please enter your travel "
             "date including the month, day and year."
