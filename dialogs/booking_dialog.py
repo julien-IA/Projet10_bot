@@ -94,7 +94,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.origin = step_context.result
         if not booking_details.travel_date or self.is_ambiguous(
             booking_details.travel_date, None
-        ):
+        ) or not self.is_valid_date(booking_details.return_date):
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, (booking_details.travel_date,1)
             )  # pylint: disable=line-too-long
@@ -109,7 +109,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.travel_date = step_context.result
         if not booking_details.return_date or self.is_ambiguous(
             booking_details.return_date
-        ):
+        ) or not self.is_valid_date(booking_details.return_date):
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, (booking_details.return_date,2)
             )  # pylint: disable=line-too-long
@@ -119,15 +119,11 @@ class BookingDialog(CancelAndHelpDialog):
     
     async def verif_date_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """ensure that the departure date is before the return date"""
-        print('coucou')
         booking_details = step_context.options
         # Capture the response to the previous step's prompt
         booking_details.return_date = step_context.result
 
-        d1 = datetime.strptime(booking_details.travel_date , "%Y-%m-%d")
-        d2 = datetime.strptime(booking_details.return_date , "%Y-%m-%d")
-        print(d1,d2)
-        if (d1 < d2):
+        if (self.is_depart_before_return(booking_details.travel_date,booking_details.return_date)):
             booking_details.return_date=None
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, (booking_details.return_date,3)
@@ -190,9 +186,16 @@ class BookingDialog(CancelAndHelpDialog):
         return "definite" not in timex_property.types
 
     def is_depart_before_return(self, timex_depart: str, timex_return: str)->bool:
-        print('coucou')
         """ensure that the departure date is before the return date"""
         d1 = datetime.strptime(timex_depart, "%Y-%m-%d")
         d2 = datetime.strptime(timex_return, "%Y-%m-%d")
         return d1 < d2
+
+    def is_valid_date(self, timex: str)->bool:
+        """ensure that the departure date is before the return date"""
+        try:
+            date = datetime.strptime(timex, "%Y-%m-%d")
+            return True
+        except ValueError:
+            return False
     
