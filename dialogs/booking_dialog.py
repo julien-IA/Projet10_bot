@@ -76,7 +76,7 @@ class BookingDialog(CancelAndHelpDialog):
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("From what city will you be travelling?")
+                    prompt=MessageFactory.text("From what city will you be travelling ?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
