@@ -123,7 +123,7 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the response to the previous step's prompt
         booking_details.return_date = step_context.result
 
-        if (self.is_depart_before_return(booking_details.travel_date,booking_details.return_date)):
+        if (not self.is_depart_before_return(booking_details.travel_date,booking_details.return_date)):
             booking_details.return_date=None
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, (booking_details.return_date,3)
@@ -188,7 +188,9 @@ class BookingDialog(CancelAndHelpDialog):
     def is_depart_before_return(self, timex_depart: str, timex_return: str)->bool:
         """ensure that the departure date is before the return date"""
         d1 = datetime.strptime(timex_depart, "%Y-%m-%d")
+        print("timex_depart", d1)
         d2 = datetime.strptime(timex_return, "%Y-%m-%d")
+        print("timex_return", d2)
         return d1 < d2
 
     def is_valid_date(self, timex: str)->bool:

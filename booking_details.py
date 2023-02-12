@@ -10,15 +10,11 @@ class BookingDetails:
         travel_date = None,
         return_date = None,
         max_cost: str = None,
-        result: bool = False,
-        unsupported_airports=None,
+        result: bool = False
     ):
-        if unsupported_airports is None:
-            unsupported_airports = []
         self.destination = destination
         self.origin = origin
         self.travel_date = travel_date
         self.return_date = return_date
         self.max_cost = max_cost
-        self.result = result,
-        self.unsupported_airports = unsupported_airports
+        self.result = result
