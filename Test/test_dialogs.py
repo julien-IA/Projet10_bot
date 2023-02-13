@@ -12,7 +12,7 @@ from botbuilder.schema import Activity, ActivityTypes, Attachment
 from botbuilder.dialogs import DialogSet, DialogTurnStatus
 from botbuilder.core.adapters import TestAdapter
 
-from config import DefaultConfig
+from config_luis import DefaultConfig
 from dialogs import MainDialog
 from dialogs import BookingDialog
 from booking_details import BookingDetails

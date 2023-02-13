@@ -10,7 +10,7 @@ from botbuilder.core import (
     NullTelemetryClient,
 )
 
-from config import DefaultConfig
+from config_luis import DefaultConfig
 
 
 class FlightBookingRecognizer(Recognizer):

@@ -27,7 +27,7 @@ from botbuilder.integration.applicationinsights.aiohttp import (
     bot_telemetry_middleware,
 )
 
-from config import DefaultConfig
+from config_luis import DefaultConfig
 from dialogs import MainDialog, BookingDialog
 from bots import DialogAndWelcomeBot
 
