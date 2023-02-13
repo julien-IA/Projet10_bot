@@ -60,6 +60,7 @@ class LuisHelper:
                 print("to_entities", to_entities)
                 if len(to_entities) > 0:
                     if recognizer_result.entities.get("to", [{"$instance": {}}])[0]:
+                        to_entities = sorted(to_entities, key=lambda x: x['score'], reverse=True)
                         result.destination = to_entities[0]["text"].capitalize()
                     else:
                         result.destination = None
@@ -71,7 +72,9 @@ class LuisHelper:
                     "from", []
                 )
                 if len(from_entities) > 0:
+                    # 
                     if recognizer_result.entities.get("from", [{"$instance": {}}])[0]:
+                        from_entities = sorted(from_entities, key=lambda x: x['score'], reverse=True)
                         result.origin = from_entities[0]["text"].capitalize()
                     else:
                         result.origin=None
@@ -84,9 +87,11 @@ class LuisHelper:
                 )
                 if len(budget_entities) > 0:
                     if recognizer_result.entities.get("budget", [{"$instance": {}}])[0]:
+                        budget_entities = sorted(budget_entities, key=lambda x: x['score'], reverse=True)
                         result.max_cost = budget_entities[0]["text"]
                     else:
                         result.max_cost = None
+                print("budget_entities", budget_entities)
                 print("result.max_cost", result.max_cost)
 
                 str_date_entities = recognizer_result.entities.get("$instance", {}).get(
@@ -94,6 +99,7 @@ class LuisHelper:
                 )
                 if len(str_date_entities) > 0:
                     if recognizer_result.entities.get("str_date", [{"$instance": {}}])[0]:
+                        str_date_entities = sorted(str_date_entities, key=lambda x: x['score'], reverse=True)
                         result.travel_date = str_date_entities[0]["datetime"]
                     else:
                         result.travel_date = None
@@ -104,6 +110,7 @@ class LuisHelper:
                 )
                 if len(end_date_entities) > 0:
                     if recognizer_result.entities.get("end_date", [{"$instance": {}}])[0]:
+                        end_date_entities = sorted(end_date_entities, key=lambda x: x['score'], reverse=True)
                         result.return_date = end_date_entities[0]["datetime"]
                     else:
                         result.return_date = None
@@ -127,6 +134,13 @@ class LuisHelper:
                             result.return_date = timex_2[0].split("T")[0]
                         else :
                             result.return_date = None
+                        
+                        if result.travel_date > result.return_date :
+                            test = result.travel_date
+                            result.travel_date = result.return_date
+                            result.return_date = test
+                        
+
                     else:
                         result.travel_date = None
                         result.return_date = None
