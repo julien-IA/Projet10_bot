@@ -32,6 +32,7 @@ from dialogs import MainDialog, BookingDialog
 from bots import DialogAndWelcomeBot
 
 from adapter_with_error_handler import AdapterWithErrorHandler
+from adapter_no import RecapMiddleware
 from flight_booking_recognizer import FlightBookingRecognizer
 
 CONFIG = DefaultConfig()
@@ -58,9 +59,15 @@ TELEMETRY_CLIENT = ApplicationInsightsTelemetryClient(
     INSTRUMENTATION_KEY, telemetry_processor=AiohttpTelemetryProcessor(), client_queue_size=10
 )
 
+
 # Code for enabling activity and personal information logging.
-# TELEMETRY_LOGGER_MIDDLEWARE = TelemetryLoggerMiddleware(telemetry_client=TELEMETRY_CLIENT, log_personal_information=True)
-# ADAPTER.use(TELEMETRY_LOGGER_MIDDLEWARE)
+
+TELEMETRY_LOGGER_MIDDLEWARE = TelemetryLoggerMiddleware(telemetry_client=TELEMETRY_CLIENT, log_personal_information=True)
+ADAPTER.use(TELEMETRY_LOGGER_MIDDLEWARE)
+RECAP_MIDDLEWARE = RecapMiddleware()
+ADAPTER.use(RECAP_MIDDLEWARE)
+
+
 
 # Create dialogs and Bot
 RECOGNIZER = FlightBookingRecognizer(CONFIG)
@@ -80,10 +87,11 @@ async def messages(req: Request) -> Response:
     auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
 
     response = await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
-
+    
     if response:
         return json_response(data=response.body, status=response.status)
     return Response(status=HTTPStatus.OK)
+
 
 
 APP = web.Application(middlewares=[bot_telemetry_middleware, aiohttp_error_middleware])

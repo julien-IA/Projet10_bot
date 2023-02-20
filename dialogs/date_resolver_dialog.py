@@ -13,7 +13,7 @@ from botbuilder.dialogs.prompts import (
     DateTimeResolution,
 )
 from .cancel_and_help_dialog import CancelAndHelpDialog
-
+from datetime import datetime
 
 class DateResolverDialog(CancelAndHelpDialog):
     """Resolve the date"""
@@ -88,7 +88,10 @@ class DateResolverDialog(CancelAndHelpDialog):
         """ Validate the date provided is in proper form. """
         if prompt_context.recognized.succeeded:
             timex = prompt_context.recognized.value[0].timex.split("T")[0]
-
+            try:
+                date = datetime.strptime(timex, "%Y-%m-%d")
+            except ValueError:
+                return False
             # TODO: Needs TimexProperty
             return "definite" in Timex(timex).types
 

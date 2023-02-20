@@ -93,8 +93,8 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.origin = step_context.result
         if not booking_details.travel_date or self.is_ambiguous(
-            booking_details.travel_date, None
-        ) or not self.is_valid_date(booking_details.return_date):
+            booking_details.travel_date
+        ) :
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, (booking_details.travel_date,1)
             )  # pylint: disable=line-too-long
@@ -109,7 +109,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.travel_date = step_context.result
         if not booking_details.return_date or self.is_ambiguous(
             booking_details.return_date
-        ) or not self.is_valid_date(booking_details.return_date):
+        ):
             return await step_context.begin_dialog(
                 DateResolverDialog.__name__, (booking_details.return_date,2)
             )  # pylint: disable=line-too-long
@@ -164,6 +164,9 @@ class BookingDialog(CancelAndHelpDialog):
             f" from: { booking_details.origin } from: { booking_details.travel_date} to: { booking_details.return_date }"
             f" for a maximum price of { booking_details.max_cost } $"
         )
+        # JQ je ne sais pas comment récupérer les infos à tracer en case de refus de l'utilisateur
+        # print(step_context.context.)
+
 
         # Offer a YES/NO prompt.
         return await step_context.prompt(
@@ -172,12 +175,15 @@ class BookingDialog(CancelAndHelpDialog):
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Complete the interaction and end the dialog."""
+        print("final_step")
         if step_context.result:
+            print('YES')
             booking_details = step_context.options
             booking_details.result = step_context.result
 
             return await step_context.end_dialog(booking_details)
-
+        print('NO')
+        
         return await step_context.end_dialog()
 
     def is_ambiguous(self, timex: str) -> bool:
@@ -193,11 +199,4 @@ class BookingDialog(CancelAndHelpDialog):
         print("timex_return", d2)
         return d1 < d2
 
-    def is_valid_date(self, timex: str)->bool:
-        """ensure that the departure date is before the return date"""
-        try:
-            date = datetime.strptime(timex, "%Y-%m-%d")
-            return True
-        except ValueError:
-            return False
     

@@ -21,7 +21,7 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
     ):
         super().__init__(settings)
         self._conversation_state = conversation_state
-
+        print("conversation_state", conversation_state)
         # Catch-all for errors.
         async def on_error(context: TurnContext, error: Exception):
             # This check writes out errors to console log
@@ -52,5 +52,5 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
             # Clear out state
             nonlocal self
             await self._conversation_state.delete(context)
-
         self.on_turn_error = on_error
+    print("je passe bip bip ...")

@@ -38,6 +38,7 @@ class LuisHelper:
         
         try:
             recognizer_result = await luis_recognizer.recognize(turn_context)
+            print("recognizer_result", recognizer_result)
 
             intent = (
                 sorted(
@@ -53,6 +54,7 @@ class LuisHelper:
             if intent == Intent.BOOK_FLIGHT.value:
                 result = BookingDetails()
                 print("entities", recognizer_result.entities)
+                print()
                 # We need to get the result from the LUIS JSON which at every level returns an array.
                 to_entities = recognizer_result.entities.get("$instance", {}).get(
                     "to", []
@@ -100,7 +102,7 @@ class LuisHelper:
                 if len(str_date_entities) > 0:
                     if recognizer_result.entities.get("str_date", [{"$instance": {}}])[0]:
                         str_date_entities = sorted(str_date_entities, key=lambda x: x['score'], reverse=True)
-                        result.travel_date = str_date_entities[0]["datetime"]
+                        result.travel_date = str_date_entities[0]["text"]
                     else:
                         result.travel_date = None
                 print("result.travel_date", result.travel_date)
@@ -111,41 +113,47 @@ class LuisHelper:
                 if len(end_date_entities) > 0:
                     if recognizer_result.entities.get("end_date", [{"$instance": {}}])[0]:
                         end_date_entities = sorted(end_date_entities, key=lambda x: x['score'], reverse=True)
-                        result.return_date = end_date_entities[0]["datetime"]
+                        result.return_date = end_date_entities[0]["text"]
                     else:
                         result.return_date = None
                 print("result.return_date", result.return_date)
 
 
-                # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop
-                # the Time part. TIMEX is a format that represents DateTime expressions that include some ambiguity.
-                # e.g. missing a Year.
-                if(result.return_date == None or result.travel_date == None):
-                    date_entities = recognizer_result.entities.get("datetime", [])
-                    if date_entities:
-                        timex_1 = date_entities[0]["timex"]
-                        timex_2 = date_entities[1]["timex"]
-
-                        if timex_1:
-                            result.travel_date = timex_1[0].split("T")[0]
-                        else :
-                            result.travel_date = None
-                        if timex_2:
-                            result.return_date = timex_2[0].split("T")[0]
-                        else :
-                            result.return_date = None
-                        
-                        if result.travel_date > result.return_date :
-                            test = result.travel_date
-                            result.travel_date = result.return_date
-                            result.return_date = test
-                        
-
+                date_entities = recognizer_result.entities.get("datetime", [])
+                print("date_entities",date_entities)
+                if date_entities:
+                    if(date_entities[0]['type']=='daterange'):
+                        print('daterange')
+                        date_str = date_entities[0]['timex'][0]
+                        # extraire les deux dates à partir de la chaîne de caractères
+                        timex_1, timex_2, _ = date_str.strip('()').split(',')
+                        print('timex_1', 'timex_2',timex_1, timex_2)                        
+                    elif(date_entities[0]['type']=='date'):
+                        print('date')
+                        timex_1=None
+                        timex_2 = date_entities[0]['timex'][0]
+                        print('timex_2',timex_2)
                     else:
-                        result.travel_date = None
-                        result.return_date = None
-                print("result.travel_date", result.travel_date)
-                print("result.return_date", result.return_date)
+                        timex_1,timex_2=None,None
+                    
+                    if('X' in timex_1):
+                        timex_1=None
+                    
+                    if('X'in timex_2):
+                        timex_2=None
+
+                    if(result.travel_date != None and result.return_date != None):
+                        if(timex_1!=None and timex_2!=None): result.travel_date,result.return_date = timex_1, timex_2
+                        else: result.travel_date,result.return_date=None,None
+                    elif(result.return_date != None):
+                        if(timex_1!=None and timex_2!=None): result.travel_date,result.return_date = timex_1, timex_2
+                        else: result.travel_date,result.return_date=None,None
+                    elif(result.travel_date != None):
+                        if(timex_1!=None and timex_2!=None): result.travel_date,result.return_date = timex_1, timex_2
+                        else: result.travel_date,result.return_date=None,None
+                    else:
+                        if(timex_1!=None and timex_2!=None): result.travel_date,result.return_date = timex_1, timex_2
+                        else: result.travel_date,result.return_date=None,None
 
         except Exception as exception:
             print(exception)

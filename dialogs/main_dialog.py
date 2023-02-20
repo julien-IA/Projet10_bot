@@ -20,7 +20,7 @@ from booking_details import BookingDetails
 from flight_booking_recognizer import FlightBookingRecognizer
 from helpers.luis_helper import LuisHelper, Intent
 from .booking_dialog import BookingDialog
-
+from copy import deepcopy
 
 class MainDialog(ComponentDialog):
     def __init__(
@@ -76,6 +76,7 @@ class MainDialog(ComponentDialog):
         )
 
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        print("act_step")
         if not self._luis_recognizer.is_configured:
             # LUIS is not configured, we just run the BookingDialog path with an empty BookingDetailsInstance.
             return await step_context.begin_dialog(
@@ -116,7 +117,9 @@ class MainDialog(ComponentDialog):
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         # If the child dialog ("BookingDialog") was cancelled or the user failed to confirm,
         # the Result here will be null.
+        print("final_step_deb")
         if step_context.result is not None:
+            print("final_step_if")
             result = step_context.result
 
             # Now we have all the booking details call the booking service.
@@ -125,9 +128,9 @@ class MainDialog(ComponentDialog):
             # time_property = Timex(result.travel_date)
             # travel_date_msg = time_property.to_natural_language(datetime.now())
             msg_txt = f"I have you booked to {result.destination} from {result.origin} from {result.travel_date} to {result.return_date}"
-            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)            
             await step_context.context.send_activity(message)
-
+        print("final_step_end")
         prompt_message = "What else can I do for you?"
         return await step_context.replace_dialog(self.id, prompt_message)
 
