@@ -21,7 +21,6 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
     ):
         super().__init__(settings)
         self._conversation_state = conversation_state
-        print("conversation_state", conversation_state)
         # Catch-all for errors.
         async def on_error(context: TurnContext, error: Exception):
             # This check writes out errors to console log

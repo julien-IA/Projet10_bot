@@ -34,6 +34,7 @@ from bots import DialogAndWelcomeBot
 from adapter_with_error_handler import AdapterWithErrorHandler
 from adapter_no import RecapMiddleware
 from flight_booking_recognizer import FlightBookingRecognizer
+from botbuilder.core.inspection import InspectionMiddleware, InspectionState
 
 CONFIG = DefaultConfig()
 
@@ -62,18 +63,20 @@ TELEMETRY_CLIENT = ApplicationInsightsTelemetryClient(
 
 # Code for enabling activity and personal information logging.
 
-TELEMETRY_LOGGER_MIDDLEWARE = TelemetryLoggerMiddleware(telemetry_client=TELEMETRY_CLIENT, log_personal_information=True)
-ADAPTER.use(TELEMETRY_LOGGER_MIDDLEWARE)
-RECAP_MIDDLEWARE = RecapMiddleware()
-ADAPTER.use(RECAP_MIDDLEWARE)
-
-
+# TELEMETRY_LOGGER_MIDDLEWARE = TelemetryLoggerMiddleware(telemetry_client=TELEMETRY_CLIENT, log_personal_information=True)
+# ADAPTER.use(TELEMETRY_LOGGER_MIDDLEWARE)
 
 # Create dialogs and Bot
 RECOGNIZER = FlightBookingRecognizer(CONFIG)
 BOOKING_DIALOG = BookingDialog()
 DIALOG = MainDialog(RECOGNIZER, BOOKING_DIALOG, telemetry_client=TELEMETRY_CLIENT)
 BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG, TELEMETRY_CLIENT)
+
+RECAP_MIDDLEWARE = RecapMiddleware(
+    bot=BOT
+)
+ADAPTER.use(RECAP_MIDDLEWARE)
+BOOKING_DIALOG
 
 
 # Listen for incoming requests on /api/messages.
@@ -83,9 +86,10 @@ async def messages(req: Request) -> Response:
         body = await req.json()
     else:
         return Response(status=HTTPStatus.UNSUPPORTED_MEDIA_TYPE)
+    
     activity = Activity().deserialize(body)
     auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
-
+    
     response = await ADAPTER.process_activity(activity, auth_header, BOT.on_turn)
     
     if response:

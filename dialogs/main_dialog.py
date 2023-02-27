@@ -13,6 +13,7 @@ from botbuilder.core import (
     TurnContext,
     BotTelemetryClient,
     NullTelemetryClient,
+    MemoryStorage,
 )
 from botbuilder.schema import InputHints
 
@@ -20,7 +21,8 @@ from booking_details import BookingDetails
 from flight_booking_recognizer import FlightBookingRecognizer
 from helpers.luis_helper import LuisHelper, Intent
 from .booking_dialog import BookingDialog
-from copy import deepcopy
+# from copy import deepcopy
+from helpers.UtteranceLog import UtteranceLog
 
 class MainDialog(ComponentDialog):
     def __init__(
@@ -67,16 +69,20 @@ class MainDialog(ComponentDialog):
             if step_context.options
             else "What can I help you with today ?"
         )
+
         prompt_message = MessageFactory.text(
             message_text, message_text, InputHints.expecting_input
         )
+             
+        utterance = prompt_message.text
+        utteranceLog = UtteranceLog()
+        await utteranceLog.store_utterance(utterance, is_bot=True)
 
         return await step_context.prompt(
             TextPrompt.__name__, PromptOptions(prompt=prompt_message)
         )
 
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        print("act_step")
         if not self._luis_recognizer.is_configured:
             # LUIS is not configured, we just run the BookingDialog path with an empty BookingDetailsInstance.
             return await step_context.begin_dialog(
@@ -92,7 +98,7 @@ class MainDialog(ComponentDialog):
             # await MainDialog._show_warning_for_unsupported_cities(
             #     step_context.context, luis_result
             # )
-            print("intent", intent)
+            # print("intent", intent)
             # Run the BookingDialog giving it whatever details we have from the LUIS call.
             return await step_context.begin_dialog(self._booking_dialog_id, luis_result)
 
@@ -110,6 +116,11 @@ class MainDialog(ComponentDialog):
             didnt_understand_message = MessageFactory.text(
                 didnt_understand_text, didnt_understand_text, InputHints.ignoring_input
             )
+
+            utterance = didnt_understand_text
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
             await step_context.context.send_activity(didnt_understand_message)
 
         return await step_context.next(None)
@@ -117,9 +128,8 @@ class MainDialog(ComponentDialog):
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         # If the child dialog ("BookingDialog") was cancelled or the user failed to confirm,
         # the Result here will be null.
-        print("final_step_deb")
+
         if step_context.result is not None:
-            print("final_step_if")
             result = step_context.result
 
             # Now we have all the booking details call the booking service.
@@ -127,11 +137,30 @@ class MainDialog(ComponentDialog):
             # If the call to the booking service was successful tell the user.
             # time_property = Timex(result.travel_date)
             # travel_date_msg = time_property.to_natural_language(datetime.now())
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance("Yes")
+
             msg_txt = f"I have you booked to {result.destination} from {result.origin} from {result.travel_date} to {result.return_date}"
-            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)            
+
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(msg_txt)
+            
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+
+            utterance = msg_txt
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
             await step_context.context.send_activity(message)
-        print("final_step_end")
+        else :
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance("No")
         prompt_message = "What else can I do for you?"
+        
+        utterance = prompt_message
+        utteranceLog = UtteranceLog()
+        await utteranceLog.store_utterance(utterance, is_bot=True)
+
         return await step_context.replace_dialog(self.id, prompt_message)
 
     # @staticmethod

@@ -11,8 +11,8 @@ from botbuilder.core import (
     NullTelemetryClient,
 )
 from botbuilder.dialogs import Dialog, DialogExtensions
-from helpers.dialog_helper import DialogHelper
-
+from helpers.UtteranceLog import UtteranceLog
+from botbuilder.core import ActivityHandler, TurnContext, StoreItem, MemoryStorage
 
 class DialogBot(ActivityHandler):
     """Main activity handler for the bot."""
@@ -37,6 +37,7 @@ class DialogBot(ActivityHandler):
         self.user_state = user_state
         self.dialog = dialog
         self.telemetry_client = telemetry_client
+        
 
     async def on_message_activity(self, turn_context: TurnContext):
         await DialogExtensions.run_dialog(
@@ -45,9 +46,15 @@ class DialogBot(ActivityHandler):
             self.conversation_state.create_property("DialogState"),
         )
 
+        utterance = turn_context.activity.text
+        utteranceLog = UtteranceLog()
+        await utteranceLog.store_utterance(utterance)
+
         # Save any state changes that might have occured during the turn.
         await self.conversation_state.save_changes(turn_context, False)
         await self.user_state.save_changes(turn_context, False)
+      
+        
 
     @property
     def telemetry_client(self) -> BotTelemetryClient:

@@ -14,6 +14,7 @@ from botbuilder.dialogs.prompts import (
 )
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from datetime import datetime
+from helpers.UtteranceLog import UtteranceLog
 
 class DateResolverDialog(CancelAndHelpDialog):
     """Resolve the date"""
@@ -61,6 +62,11 @@ class DateResolverDialog(CancelAndHelpDialog):
 
         if timex is None:
             # We were not given any date at all so prompt the user.
+            
+            utterance = prompt_msg
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
             return await step_context.prompt(
                 DateTimePrompt.__name__,
                 PromptOptions(  # pylint: disable=bad-continuation
@@ -72,6 +78,9 @@ class DateResolverDialog(CancelAndHelpDialog):
         # We have a Date we just need to check it is unambiguous.
         if "definite" in Timex(timex).types:
             # This is essentially a "reprompt" of the data we were given up front.
+            utterance = reprompt_msg
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
             return await step_context.prompt(
                 DateTimePrompt.__name__, PromptOptions(prompt=reprompt_msg)
             )

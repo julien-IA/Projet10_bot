@@ -11,6 +11,8 @@ from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 from datetime import datetime
 
+from helpers.UtteranceLog import UtteranceLog
+
 class BookingDialog(CancelAndHelpDialog):
     """Flight booking implementation."""
 
@@ -57,10 +59,15 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details = step_context.options
 
         if booking_details.destination is None:
+
+            utterance = "To what city would you like to travel?"
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("To what city would you like to travel?")
+                    prompt=MessageFactory.text("To what city would you like to travel ?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
@@ -73,6 +80,11 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the response to the previous step's prompt
         booking_details.destination = step_context.result
         if booking_details.origin is None:
+
+            utterance = "From what city will you be travelling ?"
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
@@ -142,6 +154,12 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.return_date = step_context.result
         if booking_details.max_cost is None :
+
+            utterance = "What is the maximum price for this trip ?"
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
+            
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
@@ -164,9 +182,10 @@ class BookingDialog(CancelAndHelpDialog):
             f" from: { booking_details.origin } from: { booking_details.travel_date} to: { booking_details.return_date }"
             f" for a maximum price of { booking_details.max_cost } $"
         )
-        # JQ je ne sais pas comment récupérer les infos à tracer en case de refus de l'utilisateur
-        # print(step_context.context.)
 
+        utterance = msg
+        utteranceLog = UtteranceLog()
+        await utteranceLog.store_utterance(utterance, is_bot=True)
 
         # Offer a YES/NO prompt.
         return await step_context.prompt(
@@ -175,14 +194,11 @@ class BookingDialog(CancelAndHelpDialog):
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Complete the interaction and end the dialog."""
-        print("final_step")
         if step_context.result:
-            print('YES')
             booking_details = step_context.options
             booking_details.result = step_context.result
 
             return await step_context.end_dialog(booking_details)
-        print('NO')
         
         return await step_context.end_dialog()
 
@@ -194,9 +210,9 @@ class BookingDialog(CancelAndHelpDialog):
     def is_depart_before_return(self, timex_depart: str, timex_return: str)->bool:
         """ensure that the departure date is before the return date"""
         d1 = datetime.strptime(timex_depart, "%Y-%m-%d")
-        print("timex_depart", d1)
+        # print("timex_depart", d1)
         d2 = datetime.strptime(timex_return, "%Y-%m-%d")
-        print("timex_return", d2)
+        # print("timex_return", d2)
         return d1 < d2
 
     
