@@ -18,6 +18,12 @@ from botbuilder.dialogs.prompts import (
     DateTimeResolution,
 )
 
+from config_luis import DefaultConfig
+from dialogs import MainDialog
+from dialogs import BookingDialog
+from booking_details import BookingDetails
+from flight_booking_recognizer import FlightBookingRecognizer
+
 class DialogTests(aiounittest.AsyncTestCase):
     async def test_dialog(self):
 
@@ -43,19 +49,14 @@ class DialogTests(aiounittest.AsyncTestCase):
 
         step1 = await adapter.test("Hello", "What can I help you with today ?", timeout=30000)
         step2 = await step1.send('I want to book a fly.')
-        step3 = await step2.assert_reply('To what city would you like to travel?')
+        step3 = await step2.assert_reply('To what city would you like to travel ?')
         step4 = await step3.send('I want to go to London.')
         step5 = await step4.assert_reply('From what city will you be travelling ?')
         step6 = await step5.send('I want to start from Paris.')
         step7 = await step6.assert_reply('On what date would you like to depart?')
-        step8 = await step7.send('From 25/07/2023')
+        step8 = await step7.send('25/06/2023')
         step9 = await step8.assert_reply('On what date would you like to return?')
-        step8 = await step7.send('From 01/08/2023')
+        step8 = await step7.send('30/06/2023')
         step9 = await step8.assert_reply('What is the maximum price for this trip ?')
 if __name__ == '__main__':
-    from config_luis import DefaultConfig
-    from dialogs import MainDialog
-    from dialogs import BookingDialog
-    from booking_details import BookingDetails
-    from flight_booking_recognizer import FlightBookingRecognizer
     unittest.main()
