@@ -18,3 +18,4 @@ opencensus-context==0.1.3
 opencensus-ext-azure==1.1.8
 jsonpickle==1.4.2
 applicationinsights==0.11.9
+aiounittest==1.3.0
