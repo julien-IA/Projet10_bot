@@ -1,5 +1,4 @@
 import unittest
-from ..dialogs.booking_dialog import BookingDialog
 
 class Test_TestDateValidator(unittest.TestCase):
 
@@ -20,4 +19,5 @@ class Test_TestDateValidator(unittest.TestCase):
         self.assertFalse(test_BookingDialog.is_ambiguous('2023-02-32'))
 
 if __name__ == '__main__':
+    from ..dialogs.booking_dialog import BookingDialog
     unittest.main()
