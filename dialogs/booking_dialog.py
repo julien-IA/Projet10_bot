@@ -180,7 +180,7 @@ class BookingDialog(CancelAndHelpDialog):
         msg = (
             f"Please confirm, I have you traveling to: { booking_details.destination }"
             f" from: { booking_details.origin } from: { booking_details.travel_date} to: { booking_details.return_date }"
-            f" for a maximum price of { booking_details.max_cost } $"
+            f" for a maximum price of { booking_details.max_cost }"
         )
 
         utterance = msg

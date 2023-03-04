@@ -50,6 +50,12 @@ class DialogBot(ActivityHandler):
         utteranceLog = UtteranceLog()
         await utteranceLog.store_utterance(utterance)
 
+        if (await utteranceLog.get_utterance_send()):
+            await utteranceLog.send_info()
+
+        if (await utteranceLog.get_utterance_clear()):
+            await utteranceLog.RAZ()
+
         # Save any state changes that might have occured during the turn.
         await self.conversation_state.save_changes(turn_context, False)
         await self.user_state.save_changes(turn_context, False)

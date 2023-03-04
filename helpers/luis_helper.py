@@ -6,6 +6,8 @@ from botbuilder.ai.luis import LuisRecognizer
 from botbuilder.core import IntentScore, TopIntent, TurnContext
 
 from booking_details import BookingDetails
+import json
+from helpers.UtteranceLog import UtteranceLog
 
 class Intent(Enum):
     BOOK_FLIGHT = "BookFlight"
@@ -38,7 +40,6 @@ class LuisHelper:
         
         try:
             recognizer_result = await luis_recognizer.recognize(turn_context)
-            print("recognizer_result", recognizer_result)
 
             intent = (
                 sorted(
@@ -49,17 +50,15 @@ class LuisHelper:
                 if recognizer_result.intents
                 else None
             )
-            print("execute_luis_query")
-            print("intent",intent,Intent.BOOK_FLIGHT.value)
+            # print("intent",intent,Intent.BOOK_FLIGHT.value)
             if intent == Intent.BOOK_FLIGHT.value:
                 result = BookingDetails()
-                print("entities", recognizer_result.entities)
-                print()
+                # print("entities", recognizer_result.entities)
                 # We need to get the result from the LUIS JSON which at every level returns an array.
                 to_entities = recognizer_result.entities.get("$instance", {}).get(
                     "to", []
                 )
-                print("to_entities", to_entities)
+                # print("to_entities", to_entities)
                 if len(to_entities) > 0:
                     if recognizer_result.entities.get("to", [{"$instance": {}}])[0]:
                         to_entities = sorted(to_entities, key=lambda x: x['score'], reverse=True)
@@ -69,7 +68,7 @@ class LuisHelper:
                         # result.unsupported_airports.append(
                         #     to_entities[0]["text"].capitalize()
                         # )
-                print("result.destination", result.destination)
+                # print("result.destination", result.destination)
                 from_entities = recognizer_result.entities.get("$instance", {}).get(
                     "from", []
                 )
@@ -83,7 +82,7 @@ class LuisHelper:
                         # result.unsupported_airports.append(
                         #     from_entities[0]["text"].capitalize()
                         # )
-                print("result.origin", result.origin)
+                # print("result.origin", result.origin)
                 budget_entities = recognizer_result.entities.get("$instance", {}).get(
                     "budget", []
                 )
@@ -93,8 +92,8 @@ class LuisHelper:
                         result.max_cost = budget_entities[0]["text"]
                     else:
                         result.max_cost = None
-                print("budget_entities", budget_entities)
-                print("result.max_cost", result.max_cost)
+                # print("budget_entities", budget_entities)
+                # print("result.max_cost", result.max_cost)
 
                 str_date_entities = recognizer_result.entities.get("$instance", {}).get(
                     "str_date", []
@@ -105,7 +104,7 @@ class LuisHelper:
                         result.travel_date = str_date_entities[0]["text"]
                     else:
                         result.travel_date = None
-                print("result.travel_date", result.travel_date)
+                # print("result.travel_date", result.travel_date)
                 
                 end_date_entities = recognizer_result.entities.get("$instance", {}).get(
                     "end_date", []
@@ -116,23 +115,23 @@ class LuisHelper:
                         result.return_date = end_date_entities[0]["text"]
                     else:
                         result.return_date = None
-                print("result.return_date", result.return_date)
+                # print("result.return_date", result.return_date)
 
 
                 date_entities = recognizer_result.entities.get("datetime", [])
-                print("date_entities",date_entities)
+                # print("date_entities",date_entities)
                 if date_entities:
                     if(date_entities[0]['type']=='daterange'):
-                        print('daterange')
+                        # print('daterange')
                         date_str = date_entities[0]['timex'][0]
                         # extraire les deux dates à partir de la chaîne de caractères
                         timex_1, timex_2, _ = date_str.strip('()').split(',')
-                        print('timex_1', 'timex_2',timex_1, timex_2)                        
+                        # print('timex_1', 'timex_2',timex_1, timex_2)                        
                     elif(date_entities[0]['type']=='date'):
-                        print('date')
+                        # print('date')
                         timex_1=None
                         timex_2 = date_entities[0]['timex'][0]
-                        print('timex_2',timex_2)
+                        # print('timex_2',timex_2)
                     else:
                         timex_1,timex_2=None,None
                     
@@ -157,5 +156,13 @@ class LuisHelper:
 
         except Exception as exception:
             print(exception)
+
+        intent_json=json.dumps(recognizer_result.intents, default=lambda x: x.to_json())
+        entities_json=json.dumps(recognizer_result.entities)
+        print("intent = ", intent_json)        
+        print("result = ", entities_json)
+
+        utterance_log = UtteranceLog()
+        utterance_log.set_utterance_values(intent=intent_json, entities=entities_json)
 
         return intent, result

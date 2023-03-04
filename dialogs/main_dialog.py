@@ -137,29 +137,19 @@ class MainDialog(ComponentDialog):
             # If the call to the booking service was successful tell the user.
             # time_property = Timex(result.travel_date)
             # travel_date_msg = time_property.to_natural_language(datetime.now())
-            utteranceLog = UtteranceLog()
-            await utteranceLog.store_utterance("Yes")
-
+            
             msg_txt = f"I have you booked to {result.destination} from {result.origin} from {result.travel_date} to {result.return_date}"
 
-            utteranceLog = UtteranceLog()
-            await utteranceLog.store_utterance(msg_txt)
-            
             message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
 
-            utterance = msg_txt
-            utteranceLog = UtteranceLog()
-            await utteranceLog.store_utterance(utterance, is_bot=True)
-
             await step_context.context.send_activity(message)
-        else :
-            utteranceLog = UtteranceLog()
-            await utteranceLog.store_utterance("No")
+        # else :
+        #     utteranceLog = UtteranceLog()
+        #     await utteranceLog.store_utterance("No")
         prompt_message = "What else can I do for you?"
         
-        utterance = prompt_message
+        # On réinitialise l'enregistrement de la conversation car l'utilisateur est satisfait du résumé du bot
         utteranceLog = UtteranceLog()
-        await utteranceLog.store_utterance(utterance, is_bot=True)
 
         return await step_context.replace_dialog(self.id, prompt_message)
 
