@@ -11,13 +11,6 @@ from botbuilder.core import (
 from botbuilder.schema import Activity, ActivityTypes, Attachment
 from botbuilder.dialogs import DialogSet, DialogTurnStatus
 from botbuilder.core.adapters import TestAdapter
-
-
-from dialogs import MainDialog
-from dialogs import BookingDialog
-from booking_details import BookingDetails
-from flight_booking_recognizer import FlightBookingRecognizer
-
 from botbuilder.dialogs.prompts import (
     DateTimePrompt,
     PromptValidatorContext,
@@ -60,5 +53,9 @@ class DialogTests(aiounittest.AsyncTestCase):
         step8 = await step7.send('From 01/08/2023')
         step9 = await step8.assert_reply('What is the maximum price for this trip ?')
 if __name__ == '__main__':
-     from config_luis import DefaultConfig
-     unittest.main()
+    from config_luis import DefaultConfig
+    from dialogs import MainDialog
+    from dialogs import BookingDialog
+    from booking_details import BookingDetails
+    from flight_booking_recognizer import FlightBookingRecognizer
+    unittest.main()
