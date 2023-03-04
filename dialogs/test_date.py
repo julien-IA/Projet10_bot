@@ -1,8 +1,8 @@
 import unittest
-import os
-import sys
-sys.path.append(os.path.abspath('../'))
-from ..dialogs.booking_dialog import BookingDialog
+# import os
+# import sys
+# sys.path.append(os.path.abspath('../'))
+from dialogs.booking_dialog import BookingDialog
 
 class Test_TestDateValidator(unittest.TestCase):
 
