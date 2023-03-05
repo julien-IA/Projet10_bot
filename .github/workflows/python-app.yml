@@ -17,7 +17,10 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      MY_SECRET: ${{ secrets.MY_SECRET }}
+      LUIS_APP_ID: ${{ secrets.LUIS_APP_ID }}
+      LUIS_API_KEY: ${{ secrets.LUIS_API_KEY }}
+      LUIS_API_HOST_NAME: ${{ secrets.LUIS_API_HOST_NAME }}
+      APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
