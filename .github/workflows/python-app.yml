@@ -42,4 +42,4 @@ jobs:
       run: |
         pytest Test/
       env:
-        PYTHONPATH: $PYTHONPATH:${{ GITHUB_WORKSPACE }}/dialogs:${{ GITHUB_WORKSPACE }}/tests
+        PYTHONPATH: $PYTHONPATH:$GITHUB_WORKSPACE/dialogs:$GITHUB_WORKSPACE/tests
