@@ -163,6 +163,8 @@ class LuisHelper:
         print("result = ", entities_json)
 
         utterance_log = UtteranceLog()
-        utterance_log.set_utterance_values(intent=intent_json, entities=entities_json)
-
+        try:
+            utterance_log.set_utterance_values(intent=intent_json, entities=entities_json)
+        except:
+            pass
         return intent, result
