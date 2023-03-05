@@ -1,9 +1,7 @@
 import unittest
 
-from ..dialogs.booking_dialog import BookingDialog
-import sys
-sys.path.append('./dialogs')
-sys.path.append('./Test')
+from dialogs.booking_dialog import BookingDialog
+
 class Test_TestDateValidator(unittest.TestCase):
 
     def test_is_depart_before_return(self):
