@@ -1,6 +1,6 @@
 import unittest
 
-from dialogs.booking_dialog import BookingDialog
+from ..dialogs.booking_dialog import BookingDialog
 import sys
 sys.path.append('./dialogs')
 sys.path.append('./Test')

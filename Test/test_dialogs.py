@@ -91,11 +91,11 @@ from botbuilder.dialogs.prompts import (
     DateTimeResolution,
 )
 
-from config_luis import DefaultConfig
-from dialogs import MainDialog
-from dialogs import BookingDialog
-from booking_details import BookingDetails
-from flight_booking_recognizer import FlightBookingRecognizer
+from ..config_luis import DefaultConfig
+from ..dialogs import MainDialog
+from ..dialogs import BookingDialog
+from ..booking_details import BookingDetails
+from ..flight_booking_recognizer import FlightBookingRecognizer
 
 
 class DialogTests(aiounittest.AsyncTestCase):
