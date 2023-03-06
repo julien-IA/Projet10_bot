@@ -148,8 +148,8 @@ class DialogTests(aiounittest.AsyncTestCase):
     @classmethod
     def tearDownClass(cls):
         # Arrêter l'application ici
-        cls.loop.run_until_complete(cls.app["conversation_state"].storage.delete())
-        cls.loop.run_until_complete(cls.app["conversation_state"].save_changes())
+        # cls.loop.run_until_complete(cls.app["conversation_state"].storage.delete())
+        # cls.loop.run_until_complete(cls.app["conversation_state"].save_changes())
         cls.loop.close()
 
 
