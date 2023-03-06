@@ -1,6 +1,6 @@
 import unittest
 
-from booking_dialog import BookingDialog
+from dialogs import BookingDialog
 
 class Test_TestDateValidator(unittest.TestCase):
 
