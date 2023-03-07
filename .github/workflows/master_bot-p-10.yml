@@ -56,18 +56,16 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-      steps:
-        - name: Download artifact from build job
-	  uses: actions/download-artifact@v2
-	  with:
-	    name: python-app
-	    path: .
-
-        - name: 'Deploy to Azure Web App'
-	  uses: azure/webapps-deploy@v2
-	  id: deploy-to-webapp
-	  with:
-	    app-name: 'bot-p-10'
-	    slot-name: 'Production'
-	    publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9FFFBD17B2474764917B3821040717C1 }}
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v2
+      with:
+        name: python-app
+        path: .
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
+      id: deploy-to-webapp
+      with:
+       app-name: 'bot-p-10'
+       slot-name: 'Production'
+       publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9FFFBD17B2474764917B3821040717C1 }}
