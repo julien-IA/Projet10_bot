@@ -13,7 +13,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+	env:
+      LUIS_APP_ID: ${{ secrets.LUIS_APP_ID }}
+      LUIS_API_KEY: ${{ secrets.LUIS_API_KEY }}
+      LUIS_API_HOST_NAME: ${{ secrets.LUIS_API_HOST_NAME }}
+	  APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
     steps:
       - uses: actions/checkout@v2
 
@@ -30,7 +34,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+	  - name: Test with pytest
+		run: |
+          pytest dialogs
       
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v2
