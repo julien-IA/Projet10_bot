@@ -13,11 +13,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-	env:
+
+    env:
       LUIS_APP_ID: ${{ secrets.LUIS_APP_ID }}
       LUIS_API_KEY: ${{ secrets.LUIS_API_KEY }}
       LUIS_API_HOST_NAME: ${{ secrets.LUIS_API_HOST_NAME }}
-	  APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
+      APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -30,14 +32,15 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
-	  - name: Test with pytest
-		run: |
+
+      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Test with pytest
+        run: |
           pytest dialogs
-      
+
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v2
         with:
@@ -52,10 +55,6 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-      LUIS_APP_ID: ${{ secrets.LUIS_APP_ID }}
-      LUIS_API_KEY: ${{ secrets.LUIS_API_KEY }}
-      LUIS_API_HOST_NAME: ${{ secrets.LUIS_API_HOST_NAME }}
-	    APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
 
     steps:
       - name: Download artifact from build job
@@ -63,7 +62,7 @@ jobs:
         with:
           name: python-app
           path: .
-          
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
