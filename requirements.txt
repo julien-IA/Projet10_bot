@@ -20,3 +20,16 @@ jsonpickle==1.4.2
 applicationinsights==0.11.9
 aiounittest==1.3.0
 aiohttp==3.7.4
+
+-e ./libraries/botbuilder-schema
+-e ./libraries/botframework-connector
+-e ./libraries/botframework-streaming
+-e ./libraries/botbuilder-core
+-e ./libraries/botbuilder-ai
+-e ./libraries/botbuilder-applicationinsights
+-e ./libraries/botbuilder-dialogs
+-e ./libraries/botbuilder-azure
+-e ./libraries/botbuilder-integration-applicationinsights-aiohttp
+-e ./libraries/botbuilder-adapters-slack
+-e ./libraries/botbuilder-integration-aiohttp
+-e ./libraries/botbuilder-testing
