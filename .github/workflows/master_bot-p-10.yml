@@ -13,59 +13,60 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       LUIS_APP_ID: ${{ secrets.LUIS_APP_ID }}
       LUIS_API_KEY: ${{ secrets.LUIS_API_KEY }}
       LUIS_API_HOST_NAME: ${{ secrets.LUIS_API_HOST_NAME }}
       APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
+
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Python version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.10'
+      - name: Set up Python version
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.9'
 
-    - name: Create and start virtual environment
-      run: |
-        python -m venv venv
-        source venv/bin/activate
-      
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-       
-    - name: Test with pytest
-      run: |
-        pytest dialogs
-      
-    - name: Upload artifact for deployment jobs
-      uses: actions/upload-artifact@v2
-      with:
-        name: python-app
-        path: |
-          . 
-          !venv/
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Test with pytest
+        run: |
+          pytest dialogs
+
+      - name: Upload artifact for deployment jobs
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-app
+          path: |
+            . 
+            !venv/
+
   deploy:
     runs-on: ubuntu-latest
-    env:
-      LUIS_APP_ID: ${{ secrets.LUIS_APP_ID }}
-      LUIS_API_KEY: ${{ secrets.LUIS_API_KEY }}
-      LUIS_API_HOST_NAME: ${{ secrets.LUIS_API_HOST_NAME }}
-      APPINSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.APPINSIGHTS_INSTRUMENTATION_KEY }}
     needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
     steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v2
-      with:
-        name: python-app
-        path: .
-    - name: 'Deploy to Azure Web App'
-      uses: azure/webapps-deploy@v2
-      id: deploy-to-webapp
-      with:
-       app-name: 'bot-p-10'
-       slot-name: 'Production'
-       publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9FFFBD17B2474764917B3821040717C1 }}
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: python-app
+          path: .
+
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        with:
+          app-name: 'bot-p-10'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_28A118F48CD14CCE9D181132EFEB0425 }}
