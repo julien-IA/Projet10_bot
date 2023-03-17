@@ -46,9 +46,10 @@ class DialogBot(ActivityHandler):
             self.conversation_state.create_property("DialogState"),
         )
 
-        utterance = turn_context.activity.text
-        utteranceLog = UtteranceLog()
-        await utteranceLog.store_utterance(utterance)
+        if self.conversation_state.get_cached_state(turn_context).is_changed:
+            utterance = turn_context.activity.text
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance)
 
         if (await utteranceLog.get_utterance_send()):
             await utteranceLog.send_info()

@@ -1,19 +1,29 @@
 import unittest
+from datetime import datetime
+from timedelta import Timedelta
+from dialogs import outils
 
-from dialogs import BookingDialog
+class Test_DateValidator(unittest.TestCase):
 
-class Test_TestDateValidator(unittest.TestCase):
+    def test_return_before_departure(self):
+        test_outils = outils()
+        self.assertFalse(test_outils.return_before_departure('2023-01-15','2023-01-29'))
+        self.assertTrue(test_outils.return_before_departure('2023-01-29','2023-01-15'))
 
-    def test_is_depart_before_return(self):
-        test_BookingDialog = BookingDialog()
-        self.assertTrue(test_BookingDialog.is_depart_before_return('2023-01-15','2023-01-29'))
-        self.assertFalse(test_BookingDialog.is_depart_before_return('2023-01-29','2023-01-15'))
+    def test_is_a_date(self):
+        test_outils = outils()
+        self.assertFalse(test_outils.is_a_date('not_a_date'))
+        self.assertFalse(test_outils.is_a_date('123546798'))
+        self.assertTrue(test_outils.is_a_date('2023-02-15'))  
 
-    def test_is_ambiguous(self):
-        test_BookingDialog = BookingDialog()
-        self.assertTrue(test_BookingDialog.is_ambiguous('not_a_date'))
-        self.assertTrue(test_BookingDialog.is_ambiguous('123546798'))
-        self.assertFalse(test_BookingDialog.is_ambiguous('2023-02-15'))    
+    def test_is_in_past(self):
+        test_outils = outils()
+        now = datetime.now()
+        yesterday = now - Timedelta(days=1)
+        tomorrow = now + Timedelta(days=1)
+        self.assertTrue(test_outils.is_in_the_past(yesterday))
+        self.assertFalse(test_outils.is_in_the_past(tomorrow))
+        self.assertFalse(test_outils.is_in_the_past(now))
 
 if __name__ == '__main__':
     unittest.main()

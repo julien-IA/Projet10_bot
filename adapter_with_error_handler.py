@@ -52,4 +52,4 @@ class AdapterWithErrorHandler(BotFrameworkAdapter):
             nonlocal self
             await self._conversation_state.delete(context)
         self.on_turn_error = on_error
-    print("je passe bip bip ...")
+    # print("je passe bip bip ...")

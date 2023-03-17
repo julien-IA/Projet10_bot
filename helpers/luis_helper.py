@@ -11,8 +11,6 @@ from helpers.UtteranceLog import UtteranceLog
 
 class Intent(Enum):
     BOOK_FLIGHT = "BookFlight"
-    # CANCEL = "Cancel"
-    # GET_WEATHER = "GetWeather"
     NONE_INTENT = "NoneIntent"
 
 
