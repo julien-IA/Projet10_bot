@@ -5,9 +5,9 @@
 
 import os
 
-print("Mode développement")
-from dotenv import load_dotenv
-load_dotenv(".env")
+# print("Mode développement")
+# from dotenv import load_dotenv
+# load_dotenv(".env")
 
 class DefaultConfig:
     """Configuration for the bot."""
