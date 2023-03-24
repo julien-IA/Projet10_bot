@@ -58,7 +58,7 @@ class DialogTests(aiounittest.AsyncTestCase):
         step7 = await step6.assert_reply('On what date would you like to depart?')
         step8 = await step7.send('cancel')
         step9 = await step8.assert_reply('Cancelling')
-        step10 = await step9.assert_reply('What can I help you with today ?')
+        step10 = await step9.assert_reply('What else can I do for you?')
 
     @classmethod
     async def exec_test(cls, turn_context: TurnContext):

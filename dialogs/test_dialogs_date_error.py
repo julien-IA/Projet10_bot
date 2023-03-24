@@ -59,11 +59,11 @@ class DialogTests(aiounittest.AsyncTestCase):
         step8 = await step7.send('2023-06-25')
         step9 = await step8.assert_reply('On what date would you like to return?')
         step8 = await step9.send('fdsfdsfds')
-        step10 = await step9.assert_reply('I’m sorry, for best results, please enter your travel date including the month, day and year.')
-        step11 = await step10.assert_reply('On what date would you like to depart?')
+        step10 = await step9.assert_reply('I\'m sorry, for best results, please enter your travel date including the month, day and year.')
+        step11 = await step10.assert_reply('On what date would you like to return?')
         step12 = await step11.send('fdsfdsfds')
-        step13 = await step12.assert_reply('I’m sorry, for best results, please enter your travel date including the month, day and year.')
-        step14 = await step13.assert_reply('On what date would you like to depart?')
+        step13 = await step12.assert_reply('I\'m sorry, for best results, please enter your travel date including the month, day and year.')
+        step14 = await step13.assert_reply('On what date would you like to return?')
         step15 = await step14.assert_reply('Do you need some Human help ?')
     @classmethod
     async def exec_test(cls, turn_context: TurnContext):
