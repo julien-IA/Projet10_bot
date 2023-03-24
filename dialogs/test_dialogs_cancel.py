@@ -56,12 +56,9 @@ class DialogTests(aiounittest.AsyncTestCase):
         step5 = await step4.assert_reply('From what city will you be travelling ?')
         step6 = await step5.send('I want to start from Paris.')
         step7 = await step6.assert_reply('On what date would you like to depart?')
-        step8 = await step7.send('2023-06-25')
-        step9 = await step8.assert_reply('On what date would you like to return?')
-        step8 = await step9.send('2023-06-30')
-        step10 = await step9.assert_reply('What is the maximum price for this trip ?')
-        step11 = await step10.send('869$')
-        step12 = await step11.assert_reply('Please confirm, I have you traveling to: London from: Paris from: 2023-06-25 to: 2023-06-30 for a maximum price of 869$')
+        step8 = await step7.send('cancel')
+        step9 = await step8.assert_reply('Cancelling')
+        step10 = await step9.assert_reply('What can I help you with today ?')
 
     @classmethod
     async def exec_test(cls, turn_context: TurnContext):
