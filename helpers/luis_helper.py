@@ -156,7 +156,15 @@ class LuisHelper:
             print(exception)
 
         # try:
-        intent_json=json.dumps(recognizer_result.intents, default=lambda x: x.to_json())
+        def serialize_intent_score(intent_score: IntentScore) -> Dict[str, float]:
+            return {"score": intent_score.score}
+
+        serialized_intents = {
+            intent: serialize_intent_score(score)
+            for intent, score in recognizer_result.intents.items()
+        }
+
+        intent_json=json.dumps(serialized_intents)
         entities_json=json.dumps(recognizer_result.entities)
         print("intent = ", intent_json)        
         print("result = ", entities_json)
