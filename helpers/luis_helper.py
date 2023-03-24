@@ -155,14 +155,14 @@ class LuisHelper:
         except Exception as exception:
             print(exception)
 
-        try:
-            intent_json=json.dumps(recognizer_result.intents, default=lambda x: x.to_json())
-            entities_json=json.dumps(recognizer_result.entities)
-            print("intent = ", intent_json)        
-            print("result = ", entities_json)
+        # try:
+        intent_json=json.dumps(recognizer_result.intents, default=lambda x: x.to_json())
+        entities_json=json.dumps(recognizer_result.entities)
+        print("intent = ", intent_json)        
+        print("result = ", entities_json)
 
-            utterance_log = UtteranceLog()
-            utterance_log.set_utterance_values(intent=intent_json, entities=entities_json)
-        except:
-            pass
+        utterance_log = UtteranceLog()
+        utterance_log.set_utterance_values(intent=intent_json, entities=entities_json)
+        # except:
+        #     pass
         return intent, result
