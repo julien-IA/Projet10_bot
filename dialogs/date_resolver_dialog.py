@@ -193,7 +193,7 @@ class DateResolverDialog(CancelAndHelpDialog):
 
             utteranceLog = UtteranceLog()
             prompt_context.options.validations["nb_wrong_answers"]=0
-            await utteranceLog.store_utterance("Do you need some Human help ?", is_bot=True,nb_bot=1)
+            await utteranceLog.store_utterance("Do you need some Human help ?", is_bot=True,nb_bot=3)
         
         return is_ok
 
