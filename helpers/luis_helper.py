@@ -11,7 +11,7 @@ from helpers.UtteranceLog import UtteranceLog
 
 class Intent(Enum):
     BOOK_FLIGHT = "BookFlight"
-    NONE_INTENT = "NoneIntent"
+    NONE_INTENT = "None"
 
 
 def top_intent(intents: Dict[Intent, dict]) -> TopIntent:

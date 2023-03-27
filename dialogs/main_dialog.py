@@ -101,7 +101,19 @@ class MainDialog(ComponentDialog):
             # print("intent", intent)
             # Run the BookingDialog giving it whatever details we have from the LUIS call.
             return await step_context.begin_dialog(self._booking_dialog_id, luis_result)
+        elif intent == Intent.NONE_INTENT.value :
+            didnt_understand_text = (
+                "Sorry, I didn't get that. Please try asking in a different way"
+            )
+            didnt_understand_message = MessageFactory.text(
+                didnt_understand_text, didnt_understand_text, InputHints.ignoring_input
+            )
 
+            utterance = didnt_understand_text
+            utteranceLog = UtteranceLog()
+            await utteranceLog.store_utterance(utterance, is_bot=True)
+
+            await step_context.context.send_activity(didnt_understand_message)
         else:
             didnt_understand_text = (
                 "Sorry, I didn't get that. Please try asking in a different way"
